@@ -26,7 +26,8 @@ extension Reactive where Base: SwiftyCodeView {
 
 @objc
 public protocol SwiftyCodeViewDelegate: class {
-    func codeView(sender: SwiftyCodeView, didFinishInput code: String)
+    @objc optional func codeView(sender: SwiftyCodeView, didFinishInput code: String)
+    @objc optional func codeView(sender: SwiftyCodeView, didFinishInput code: String, stackView: UIStackView)
 }
 
 @IBDesignable
@@ -130,7 +131,8 @@ extension SwiftyCodeView: UITextFieldDelegate, SwiftyCodeTextFieldDelegate {
             item.textField.text = string
             sendActions(for: .valueChanged)
             if index == length - 1 { //is last textfield
-                delegate?.codeView(sender: self, didFinishInput: self.code)
+                delegate?.codeView!(sender: self, didFinishInput: self.code)
+                delegate?.codeView!(sender: self, didFinishInput: self.code, stackView: stackView)
                 textField.resignFirstResponder()
                 return false
             }
