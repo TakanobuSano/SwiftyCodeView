@@ -6,9 +6,28 @@
 
 import UIKit
 
+#if canImport(RxCocoa)
+import RxSwift
+import RxCocoa
+extension Reactive where Base: SwiftyCodeView {
+    
+    /// Reactive wrapper for `code` property.
+    internal var code: ControlProperty<String> {
+        return controlProperty(editingEvents: [.allEditingEvents, .valueChanged],
+                               getter: { codeView in
+                                codeView.code
+        }, setter: { codeView, value in
+            codeView.code = value
+        })
+    }
+}
+#endif
+
+
 @objc
 public protocol SwiftyCodeViewDelegate: class {
-    func codeView(sender: SwiftyCodeView, didFinishInput code: String)
+    @objc optional func codeView(sender: SwiftyCodeView, didFinishInput code: String)
+    @objc optional func codeView(sender: SwiftyCodeView, didFinishInput code: String, stackView: UIStackView)
 }
 
 @IBDesignable
@@ -112,7 +131,8 @@ extension SwiftyCodeView: UITextFieldDelegate, SwiftyCodeTextFieldDelegate {
             item.textField.text = string
             sendActions(for: .valueChanged)
             if index == length - 1 { //is last textfield
-                delegate?.codeView(sender: self, didFinishInput: self.code)
+                delegate?.codeView!(sender: self, didFinishInput: self.code)
+                delegate?.codeView!(sender: self, didFinishInput: self.code, stackView: stackView)
                 textField.resignFirstResponder()
                 return false
             }
